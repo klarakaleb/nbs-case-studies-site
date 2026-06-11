@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>NbS Case Studies — Coverage Map</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="map.css">
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+</head>
+<body>
+  <header>
+    <h1>NbS Case Studies — Coverage Map</h1>
+    <p class="tagline">Countries shaded by the number of documented case studies on the
+      platform. Hover for counts; click for the case list. <a href="index.html" style="color:white;text-decoration:underline">← back to portal</a></p>
+  </header>
+
+  <main>
+    <div class="map-controls">
+      <span id="case-count-summary"></span>
+      <span class="legend">
+        <span class="legend-swatch" style="background:#eee;border:1px solid #999"></span> No cases yet
+        <span class="legend-swatch" style="background:#c7e9c0"></span> 1
+        <span class="legend-swatch" style="background:#74c476"></span> 2–4
+        <span class="legend-swatch" style="background:#31a354"></span> 5–9
+        <span class="legend-swatch" style="background:#006d2c"></span> 10+
+      </span>
+    </div>
+
+    <div id="map"></div>
+
+    <div id="case-list">
+      <p class="hint">Click any country to list its documented cases here.</p>
+    </div>
+
+    <section class="contribute">
+      <h2>See a gap?</h2>
+      <p>If you know of an NbS project that should be documented in a region that's
+        thin on the map, <a href="index.html">submit it via the team portal</a>.
+        The map is a live snapshot of what we have — and what we're missing.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>NbS Knowledge Hub case studies · NbSI, University of Oxford</p>
+    <p>Map data: <a href="https://github.com/topojson/world-atlas">world-atlas</a>;
+      case counts from the project database (private repo).</p>
+  </footer>
+
+  <script src="map.js"></script>
+</body>
+</html>
