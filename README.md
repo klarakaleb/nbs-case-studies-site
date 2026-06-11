@@ -1,8 +1,9 @@
 # nbs-case-studies-site
 
-Public landing page for the NbS case studies project. Three buttons:
-two to Google Forms (submit case / suggest source), one to the team
-Google Sheet (review pending items).
+Public landing page for the NbS case studies project. Buttons link to
+the team Google Sheet: add a case/source via the *Submissions inbox*
+tab, review pending items in *Pending review*. No Google Forms — the
+team works directly in the Sheet.
 
 ## How to deploy
 
@@ -12,18 +13,8 @@ Google Sheet (review pending items).
 4. The site goes live at `https://klarakaleb.github.io/nbs-case-studies-site/`
    within a minute.
 
-## Before pushing — replace placeholders
-
-In `index.html`, replace:
-
-- `https://forms.gle/REPLACE_WITH_FORM_LINK` (twice) with your Google
-  Form's short link
-- `https://docs.google.com/spreadsheets/d/REPLACE_WITH_SHEET_ID/edit`
-  with your Google Sheet's URL
-- `YOUR-GH-USERNAME` (in the footer) with your actual GitHub username
-
-That's it. No backend, no auth — privacy is enforced at the Google layer
-(only Sheet collaborators can see the Sheet content).
+No backend, no auth — privacy is enforced at the Google layer (only
+Sheet collaborators can open the Sheet links or see its content).
 
 ## Coverage map (`map.html`)
 
