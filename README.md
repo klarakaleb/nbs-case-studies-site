@@ -28,15 +28,18 @@ That's it. No backend, no auth — privacy is enforced at the Google layer
 ## Coverage map (`map.html`)
 
 A D3 choropleth showing the world's countries shaded by the number of
-documented case studies. Click a country to list its cases. Inspired by
+documented case studies. Click a country for its count. Inspired by
 Legal Data Hunter's state-shaded coverage map.
 
-Data source: `cases.json` in this folder. Format is a flat array:
+Data source: `cases.json` in this folder. Format is country → count —
+**counts only, by design**: this file is public, and individual study
+titles/locations must never be published here.
 
 ```json
-[
-  {"title": "The Great Fen", "country": "United Kingdom", "location": "Cambridgeshire", "source": "HUB"}
-]
+{
+  "United Kingdom": 3,
+  "Kenya": 1
+}
 ```
 
 Two ways to keep it updated:

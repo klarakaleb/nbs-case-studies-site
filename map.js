@@ -1,6 +1,7 @@
 // NbS case studies coverage map.
 // Uses D3 + topojson to render a Natural Earth world projection,
-// shades each country by case count, surfaces a per-country list on click.
+// shades each country by case count. Counts only — individual study
+// names are deliberately never published on this public page.
 
 // Country-name reconciliation. The world-atlas TopoJSON uses one set of names;
 // our CSVs use another. Add aliases here as you spot mismatches.
@@ -44,23 +45,32 @@ function colorFor(count) {
 
 Promise.all([
   d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json"),
-  d3.json("cases.json").catch(() => []),  // tolerate missing cases.json on first deploy
-]).then(([world, cases]) => {
+  d3.json("cases.json").catch(() => ({})),  // tolerate missing cases.json on first deploy
+]).then(([world, data]) => {
   const countries = topojson.feature(world, world.objects.countries);
   const nameLookup = buildNameLookup();
 
-  // Build a map: topo country name -> [case objects]
-  const casesByCountry = {};
-  cases.forEach(c => {
-    const raw = (c.country || "").trim();
-    const norm = nameLookup[raw.toLowerCase()] || raw;
-    if (!casesByCountry[norm]) casesByCountry[norm] = [];
-    casesByCountry[norm].push(c);
+  // cases.json maps country name -> count. (Guard: if an old-format flat
+  // array of case objects ever shows up, aggregate it to counts and drop
+  // the rest — nothing beyond country/count may be rendered publicly.)
+  const rawCounts = Array.isArray(data)
+    ? data.reduce((acc, c) => {
+        const k = (c.country || "").trim();
+        if (k) acc[k] = (acc[k] || 0) + 1;
+        return acc;
+      }, {})
+    : (data || {});
+
+  // Build a map: topo country name -> count
+  const countByCountry = {};
+  Object.entries(rawCounts).forEach(([raw, n]) => {
+    const norm = nameLookup[raw.trim().toLowerCase()] || raw.trim();
+    countByCountry[norm] = (countByCountry[norm] || 0) + n;
   });
 
   // Summary
-  const totalCases = cases.length;
-  const totalCountries = Object.keys(casesByCountry).length;
+  const totalCases = Object.values(countByCountry).reduce((a, b) => a + b, 0);
+  const totalCountries = Object.keys(countByCountry).length;
   d3.select("#case-count-summary")
     .text(`${totalCases} case${totalCases === 1 ? "" : "s"} across ${totalCountries} countr${totalCountries === 1 ? "y" : "ies"}.`);
 
@@ -94,14 +104,14 @@ Promise.all([
     .join("path")
     .attr("class", "country")
     .attr("d", path)
-    .attr("fill", d => colorFor((casesByCountry[d.properties.name] || []).length))
+    .attr("fill", d => colorFor(countByCountry[d.properties.name] || 0))
     .attr("stroke", "#777")
     .attr("stroke-width", 0.4)
     .on("mouseover", (e, d) => {
-      const c = casesByCountry[d.properties.name] || [];
+      const n = countByCountry[d.properties.name] || 0;
       tooltip.transition().duration(120).style("opacity", 1);
       tooltip
-        .html(`<strong>${d.properties.name}</strong><br/>${c.length} case${c.length === 1 ? "" : "s"}`)
+        .html(`<strong>${d.properties.name}</strong><br/>${n} case${n === 1 ? "" : "s"}`)
         .style("left", (e.pageX + 12) + "px")
         .style("top", (e.pageY - 28) + "px");
     })
@@ -112,23 +122,20 @@ Promise.all([
       tooltip.transition().duration(280).style("opacity", 0);
     })
     .on("click", (_, d) => {
-      const c = casesByCountry[d.properties.name] || [];
+      const n = countByCountry[d.properties.name] || 0;
       const list = d3.select("#case-list");
       list.html("");
-      list.append("h2").text(`${d.properties.name} — ${c.length} case${c.length === 1 ? "" : "s"}`);
-      if (!c.length) {
+      list.append("h2").text(`${d.properties.name} — ${n} case${n === 1 ? "" : "s"}`);
+      if (!n) {
         list.append("p").html(
           `No NbS case studies documented here yet. ` +
           `<a href="index.html">Submit one</a> if you know of a project that should be on the platform.`
         );
         return;
       }
-      const ul = list.append("ul");
-      c.forEach(item => {
-        const li = ul.append("li");
-        li.append("strong").text(item.title);
-        if (item.location) li.append("span").text(` — ${item.location}`);
-        if (item.source) li.append("span").attr("class", "source-tag").text(` [${item.source}]`);
-      });
+      list.append("p").html(
+        `${n} documented case stud${n === 1 ? "y" : "ies"} on the platform. ` +
+        `Know of another? <a href="index.html">Suggest it via the team portal</a>.`
+      );
     });
 });
