@@ -18,6 +18,7 @@ const COUNTRY_ALIASES = {
   "South Korea": ["Republic of Korea", "Korea, Republic of"],
   "Moldova": ["Republic of Moldova"],
   "Palestine": ["West Bank and Gaza"],
+  "Marshall Is.": ["Marshall Islands"],
   "Congo": ["Republic of the Congo", "Congo (Republic)"],
   "Eswatini": ["Swaziland"],
   "N. Cyprus": ["Northern Cyprus"],
@@ -48,7 +49,8 @@ function colorFor(count) {
 }
 
 Promise.all([
-  d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json"),
+  // 50m resolution so small island nations (e.g. Marshall Islands) render.
+  d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json"),
   d3.json("cases.json").catch(() => ({})),  // tolerate missing cases.json on first deploy
 ]).then(([world, data]) => {
   const countries = topojson.feature(world, world.objects.countries);
@@ -76,7 +78,7 @@ Promise.all([
   const totalCases = Object.values(countByCountry).reduce((a, b) => a + b, 0);
   const totalCountries = Object.keys(countByCountry).length;
   d3.select("#case-count-summary")
-    .text(`${totalCases} case${totalCases === 1 ? "" : "s"} across ${totalCountries} countr${totalCountries === 1 ? "y" : "ies"}.`);
+    .text(`${totalCases} unique case stud${totalCases === 1 ? "y" : "ies"} across ${totalCountries} countr${totalCountries === 1 ? "y" : "ies"}.`);
 
   // Map dimensions
   const width = 960;
